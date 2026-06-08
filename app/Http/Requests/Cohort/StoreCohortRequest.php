@@ -12,7 +12,7 @@ class StoreCohortRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->isBranchManager(); // LC-2
     }
 
     /**
@@ -23,7 +23,12 @@ class StoreCohortRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'track_id' => ['required', 'uuid', 'exists:tracks,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'starts_at' => ['required', 'date'],
+            'ends_at' => ['required', 'date', 'after:starts_at'],
+            'track_admin_ids' => ['nullable', 'array'],
+            'track_admin_ids.*' => ['uuid', 'exists:users,id'],
         ];
     }
 }
