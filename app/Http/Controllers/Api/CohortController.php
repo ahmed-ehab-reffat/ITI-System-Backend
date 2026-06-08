@@ -18,9 +18,28 @@ class CohortController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCohortRequest $request): JsonResponse
     {
-        //
+        $this->authorize('create', Cohort::class);
+
+        // LC-1: one active cohort per track
+        $alreadyActive = Cohort::where('track_id', $request->track_id)
+            ->where('status', 'active')
+            ->exists();
+
+        if ($alreadyActive) {
+            return response()->json([
+                'message' => 'This track already has an active cohort.',
+            ], 409);
+        }
+
+        $cohort = Cohort::create($request->safe()->except('track_admin_ids'));
+
+        if ($request->track_admin_ids) {
+            $cohort->trackAdmins()->attach($request->track_admin_ids);
+        }
+
+        return response()->json(new CohortResource($cohort->load('trackAdmins', 'track')), 201);
     }
 
     /**
