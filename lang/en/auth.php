@@ -16,5 +16,8 @@ return [
     'failed' => 'These credentials do not match our records.',
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'login_success' => 'Logged in successfully.',
+    'logout_success' => 'Logged out successfully.',
+    'account_expired' => 'Your account has expired. Please contact the administrator.',
 
 ];

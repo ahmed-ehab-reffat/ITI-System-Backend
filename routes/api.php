@@ -1,4 +1,3 @@
-
 <?php
 
 use App\Http\Controllers\Api\AuthController;
@@ -23,13 +22,7 @@ use App\Http\Controllers\Api\QrController;
 use Illuminate\Support\Facades\Route;
 
 // ── Public ──────────────────────────────────────────────
-Route::post('/auth/login',  [AuthController::class, 'login']);
-// Engagements
-   Route::apiResource('cohorts.engagements', EngagementController::class)->shallow();
-
-    // Sessions
-   Route::apiResource('engagements.sessions', SessionController::class)->shallow();
-    Route::patch('sessions/{session}/deliver', [SessionController::class, 'deliver']);
+Route::post('/auth/login', [AuthController::class, 'login'])->name('login');
 
 // ── Authenticated ────────────────────────────────────────
 Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
@@ -51,21 +44,21 @@ Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
 
     // Lab Groups
     Route::apiResource('cohorts.lab-groups', LabGroupController::class)->shallow();
-    Route::post('lab-groups/{labGroup}/students',           [LabGroupController::class, 'assignStudents']);
-    Route::delete('lab-groups/{labGroup}/students/{user}',  [LabGroupController::class, 'removeStudent']);
+    Route::post('lab-groups/{labGroup}/students',          [LabGroupController::class, 'assignStudents']);
+    Route::delete('lab-groups/{labGroup}/students/{user}', [LabGroupController::class, 'removeStudent']);
 
     // Engagements
-   // Route::apiResource('cohorts.engagements', EngagementController::class)->shallow();
+    Route::apiResource('cohorts.engagements', EngagementController::class)->shallow();
 
     // Sessions
-   // Route::apiResource('engagements.sessions', SessionController::class)->shallow();
-    //Route::patch('sessions/{session}/deliver', [SessionController::class, 'deliver']);
+    Route::apiResource('engagements.sessions', SessionController::class)->shallow();
+    Route::patch('sessions/{session}/deliver', [SessionController::class, 'deliver']);
 
     // Attendance
-    Route::get('sessions/{session}/attendance',           [AttendanceController::class, 'index']);
-    Route::post('sessions/{session}/attendance',          [AttendanceController::class, 'store']);
-    Route::patch('sessions/{session}/attendance/{record}',[AttendanceController::class, 'update']);
-    Route::get('students/{user}/attendance',              [AttendanceController::class, 'studentHistory']);
+    Route::get('sessions/{session}/attendance',            [AttendanceController::class, 'index']);
+    Route::post('sessions/{session}/attendance',           [AttendanceController::class, 'store']);
+    Route::patch('sessions/{session}/attendance/{record}', [AttendanceController::class, 'update']);
+    Route::get('students/{user}/attendance',               [AttendanceController::class, 'studentHistory']);
 
     // Ledger
     Route::get('students/{user}/ledger', [AttendanceLedgerController::class, 'show']);
@@ -76,25 +69,25 @@ Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
     Route::patch('excuse-requests/{excuseRequest}/reject',  [ExcuseRequestController::class, 'reject']);
 
     // Submissions
-    Route::get('sessions/{session}/submissions',                       [SubmissionController::class, 'index']);
-    Route::post('sessions/{session}/submissions',                      [SubmissionController::class, 'store']);
-    Route::patch('sessions/{session}/submissions/{submission}/grade',  [SubmissionController::class, 'grade']);
-    Route::get('students/{user}/submissions',                          [SubmissionController::class, 'studentIndex']);
+    Route::get('sessions/{session}/submissions',                      [SubmissionController::class, 'index']);
+    Route::post('sessions/{session}/submissions',                     [SubmissionController::class, 'store']);
+    Route::patch('sessions/{session}/submissions/{submission}/grade', [SubmissionController::class, 'grade']);
+    Route::get('students/{user}/submissions',                         [SubmissionController::class, 'studentIndex']);
 
     // Grades
-    Route::get('courses/{course}/grades',          [GradeController::class, 'index']);
-    Route::post('courses/{course}/grades',         [GradeController::class, 'store']);
-    Route::get('courses/{course}/grades/{grade}',  [GradeController::class, 'show']);
-    Route::get('students/{user}/grades/summary',   [GradeController::class, 'summary']);
+    Route::get('courses/{course}/grades',         [GradeController::class, 'index']);
+    Route::post('courses/{course}/grades',        [GradeController::class, 'store']);
+    Route::get('courses/{course}/grades/{grade}', [GradeController::class, 'show']);
+    Route::get('students/{user}/grades/summary',  [GradeController::class, 'summary']);
 
     // Grade Overrides
-    Route::get('grades/{grade}/overrides',    [GradeOverrideController::class, 'index']);
-    Route::post('grades/{grade}/override',    [GradeOverrideController::class, 'store']);
+    Route::get('grades/{grade}/overrides',  [GradeOverrideController::class, 'index']);
+    Route::post('grades/{grade}/override',  [GradeOverrideController::class, 'store']);
 
     // Student Tags
-    Route::get('students/{user}/tags',    [StudentTagController::class, 'index']);
-    Route::post('students/{user}/tags',   [StudentTagController::class, 'store']);
-    Route::delete('students/{user}/tags/{tag}', [StudentTagController::class, 'destroy']);
+    Route::get('students/{user}/tags',              [StudentTagController::class, 'index']);
+    Route::post('students/{user}/tags',             [StudentTagController::class, 'store']);
+    Route::delete('students/{user}/tags/{tag}',     [StudentTagController::class, 'destroy']);
 
     // Announcements
     Route::apiResource('cohorts.announcements', AnnouncementController::class)->shallow();
@@ -104,11 +97,11 @@ Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
     Route::get('billing/{user}', [BillingController::class, 'show']);
 
     // Analytics
-    Route::get('analytics/branch',            [AnalyticsController::class, 'branch']);
-    Route::get('analytics/cohorts/{cohort}',  [AnalyticsController::class, 'cohort']);
-    Route::get('analytics/instructor',        [AnalyticsController::class, 'instructor']);
-    Route::get('analytics/student',           [AnalyticsController::class, 'student']);
-    Route::get('analytics/at-risk',           [AnalyticsController::class, 'atRisk']);
+    Route::get('analytics/branch',           [AnalyticsController::class, 'branch']);
+    Route::get('analytics/cohorts/{cohort}', [AnalyticsController::class, 'cohort']);
+    Route::get('analytics/instructor',       [AnalyticsController::class, 'instructor']);
+    Route::get('analytics/student',          [AnalyticsController::class, 'student']);
+    Route::get('analytics/at-risk',          [AnalyticsController::class, 'atRisk']);
 
     // QR
     Route::get('qr/session/{session}', [QrController::class, 'generate']);
