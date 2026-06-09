@@ -27,7 +27,7 @@ class StoreEngagementRequest extends FormRequest
             'instructor_id' => [
                 'required', 'uuid',
                 Rule::exists('users', 'id')->where(function ($query) {
-                    $query->where('role', 'instructor');
+                    $query->whereIn('role', ['instructor', 'track_admin']);
                 }),
             ],
             'type' => ['required', 'string', 'in:lecture,lab'],
