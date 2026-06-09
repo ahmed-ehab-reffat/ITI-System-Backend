@@ -12,7 +12,7 @@ class StoreCourseRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->isTrackAdmin();
     }
 
     /**
@@ -23,7 +23,19 @@ class StoreCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', 'string', 'max:255'],
+            'lab_weight' => ['required', 'integer', 'min:0', 'max:100'],
+            'exam_weight' => ['required', 'integer', 'min:0', 'max:100'],
         ];
+    }
+
+    // GRD-1: weights must sum to 100
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($v) {
+            if ($this->lab_weight + $this->exam_weight !== 100) {
+                $v->errors()->add('lab_weight', 'lab_weight and exam_weight must sum to 100.');
+            }
+        });
     }
 }
