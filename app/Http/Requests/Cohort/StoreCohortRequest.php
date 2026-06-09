@@ -4,6 +4,7 @@ namespace App\Http\Requests\Cohort;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCohortRequest extends FormRequest
 {
@@ -27,8 +28,14 @@ class StoreCohortRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
+            'status' => ['nullable', 'string', 'in:open,active,closed'],
             'track_admin_ids' => ['nullable', 'array'],
-            'track_admin_ids.*' => ['uuid', 'exists:users,id'],
+            'track_admin_ids.*' => [
+                'uuid',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'track_admin');
+                }),
+            ],
         ];
     }
 }
