@@ -14,6 +14,13 @@ class LabGroupResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'cohort_id' => $this->cohort_id,
+            'name' => $this->name,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'students' => UserResource::collection($this->whenLoaded('students')),
+        ];
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Requests\Course;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCourseRequest extends FormRequest
+class UpdateCourseRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,18 +23,25 @@ class StoreCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'lab_weight' => ['required', 'integer', 'min:0', 'max:100'],
-            'exam_weight' => ['required', 'integer', 'min:0', 'max:100'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'lab_weight' => ['sometimes', 'integer', 'min:0', 'max:100'],
+            'exam_weight' => ['sometimes', 'integer', 'min:0', 'max:100'],
         ];
     }
 
-    // GRD-1: weights must sum to 100
+    // GRD-1: weights must sum to 100 (re-check on partial update)
     public function withValidator($validator): void
     {
         $validator->after(function ($v) {
-            $lab = (int) $this->input('lab_weight', 0);
-            $exam = (int) $this->input('exam_weight', 0);
+            $course = $this->route('course');
+
+            $lab = $this->has('lab_weight')
+                ? (int) $this->input('lab_weight')
+                : (int) $course->lab_weight;
+
+            $exam = $this->has('exam_weight')
+                ? (int) $this->input('exam_weight')
+                : (int) $course->exam_weight;
 
             if ($lab + $exam !== 100) {
                 $v->errors()->add('lab_weight', 'lab_weight and exam_weight must sum to 100.');

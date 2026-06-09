@@ -4,9 +4,8 @@ namespace App\Http\Requests\LabGroup;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class AssignStudentsRequest extends FormRequest
+class UpdateLabGroupRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +23,7 @@ class AssignStudentsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_ids' => ['required', 'array', 'min:1'],
-            'student_ids.*' => [
-                'uuid',
-                Rule::exists('users', 'id')->where(function ($query) {
-                    $query->where('role', 'student');
-                }),
-            ],
+            'name' => ['sometimes', 'string', 'max:255'],
         ];
     }
 }

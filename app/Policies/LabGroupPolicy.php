@@ -13,7 +13,7 @@ class LabGroupPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isBranchManager() || $user->isTrackAdmin();
     }
 
     /**
@@ -21,7 +21,7 @@ class LabGroupPolicy
      */
     public function view(User $user, LabGroup $labGroup): bool
     {
-        return false;
+        return $user->isBranchManager() || $user->isTrackAdmin();
     }
 
     /**
@@ -29,7 +29,7 @@ class LabGroupPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -37,7 +37,7 @@ class LabGroupPolicy
      */
     public function update(User $user, LabGroup $labGroup): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -45,7 +45,7 @@ class LabGroupPolicy
      */
     public function delete(User $user, LabGroup $labGroup): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -53,7 +53,7 @@ class LabGroupPolicy
      */
     public function restore(User $user, LabGroup $labGroup): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -61,6 +61,6 @@ class LabGroupPolicy
      */
     public function forceDelete(User $user, LabGroup $labGroup): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 }

@@ -13,7 +13,7 @@ class EngagementPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isBranchManager() || $user->isTrackAdmin();
     }
 
     /**
@@ -21,6 +21,15 @@ class EngagementPolicy
      */
     public function view(User $user, Engagement $engagement): bool
     {
+        if ($user->isBranchManager() || $user->isTrackAdmin()) {
+            return true;
+        }
+
+        // Instructors can view their own engagements
+        if ($user->isInstructor()) {
+            return $engagement->instructor_id === $user->id;
+        }
+
         return false;
     }
 
@@ -29,7 +38,7 @@ class EngagementPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -37,7 +46,7 @@ class EngagementPolicy
      */
     public function update(User $user, Engagement $engagement): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -45,7 +54,7 @@ class EngagementPolicy
      */
     public function delete(User $user, Engagement $engagement): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -53,7 +62,7 @@ class EngagementPolicy
      */
     public function restore(User $user, Engagement $engagement): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
     /**
@@ -61,6 +70,6 @@ class EngagementPolicy
      */
     public function forceDelete(User $user, Engagement $engagement): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 }
