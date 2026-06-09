@@ -10,7 +10,7 @@ class Track extends Model
 {
     use HasUuids;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'code', 'description'];
 
     public function cohorts(): HasMany
     {
