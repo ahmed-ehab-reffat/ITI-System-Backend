@@ -8,7 +8,7 @@ use App\Models\User;
 
 class AttendanceLedgerService
 {
-    // called when student is enrolled.
+    
     public function initialise(User $student, string $cohortId): AttendanceLedger
     {
         return AttendanceLedger::firstOrCreate(
@@ -17,7 +17,6 @@ class AttendanceLedgerService
         );
     }
 
-     // Deduct points for a new absence
     public function deduct(User $student, string $cohortId, string $status): void
     {
         $amount = $this->deductionFor($status);
@@ -30,7 +29,6 @@ class AttendanceLedgerService
         $ledger->decrement('balance', $amount);
     }
 
-    // Adjust the ledger when an attendance record's status changes.
     public function adjustForStatusChange(
         AttendanceRecord $record,
         string $oldStatus,
@@ -46,13 +44,20 @@ class AttendanceLedgerService
         $ledger->decrement('balance', $this->deductionFor($newStatus));
     }
 
-    // Return the student's current balance for a cohort.
     public function balance(User $student, string $cohortId): int
     {
         return $this->ledgerFor($student, $cohortId)->balance;
     }
 
-    //Helpers
+    public function credit(User $student, string $cohortId, int $amount): void
+    {
+        if ($amount === 0) {
+            return;
+        }
+
+        $ledger = $this->ledgerFor($student, $cohortId);
+        $ledger->increment('balance', $amount);
+    }
 
     private function deductionFor(string $status): int
     {
