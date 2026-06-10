@@ -4,63 +4,61 @@ namespace App\Policies;
 
 use App\Models\ExcuseRequest;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class ExcuseRequestPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isStudent() || $user->isTrackAdmin() || $user->isBranchManager();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, ExcuseRequest $excuseRequest): bool
     {
-        return false;
+        if ($user->isStudent()) {
+            return $excuseRequest->student_id === $user->id;
+        }
+
+        if ($user->isTrackAdmin()) {
+            return $this->managesExcuseCohort($user, $excuseRequest);
+        }
+
+        return $user->isBranchManager();
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isStudent();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, ExcuseRequest $excuseRequest): bool
+    public function approve(User $user, ExcuseRequest $excuseRequest): bool
     {
-        return false;
+        if (! $user->isTrackAdmin()) {
+            return false;
+        }
+
+        return $this->managesExcuseCohort($user, $excuseRequest);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, ExcuseRequest $excuseRequest): bool
+    public function reject(User $user, ExcuseRequest $excuseRequest): bool
     {
-        return false;
+        if (! $user->isTrackAdmin()) {
+            return false;
+        }
+
+        return $this->managesExcuseCohort($user, $excuseRequest);
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, ExcuseRequest $excuseRequest): bool
+    private function managesExcuseCohort(User $user, ExcuseRequest $excuseRequest): bool
     {
-        return false;
-    }
+        $cohortId = $excuseRequest->attendanceRecord
+            ?->session
+            ?->engagement
+            ?->cohort_id;
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, ExcuseRequest $excuseRequest): bool
-    {
-        return false;
+        if (! $cohortId) {
+            return false;
+        }
+
+        return $user->managedCohorts()->where('cohorts.id', $cohortId)->exists();
     }
 }

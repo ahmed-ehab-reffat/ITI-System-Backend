@@ -7,23 +7,19 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class OverrideGradeRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->isTrackAdmin();
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'new_value' => ['required', 'numeric', 'min:0', 'max:100'],
+            'reason'    => ['required', 'string', 'max:2000'],
         ];
     }
 }

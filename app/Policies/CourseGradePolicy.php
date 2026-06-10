@@ -2,65 +2,47 @@
 
 namespace App\Policies;
 
+use App\Models\Course;
 use App\Models\CourseGrade;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CourseGradePolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, Course $course): bool
     {
-        return false;
+        return $user->isTrackAdmin() || $user->isBranchManager();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, CourseGrade $courseGrade): bool
     {
-        return false;
+        if ($user->isStudent()) {
+            return $courseGrade->student_id === $user->id;
+        }
+
+        return $user->isTrackAdmin() || $user->isBranchManager();
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isTrackAdmin();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, CourseGrade $courseGrade): bool
+    public function viewSummary(User $user, User $student): bool
     {
-        return false;
+        return match ($user->role) {
+            'branch_manager', 'track_admin', 'instructor' => true,
+            'student' => $user->id === $student->id,
+            default   => false,
+        };
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, CourseGrade $courseGrade): bool
+    public function viewOverrides(User $user, CourseGrade $courseGrade): bool
     {
-        return false;
+        return $user->isTrackAdmin() || $user->isBranchManager();
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, CourseGrade $courseGrade): bool
+    public function override(User $user, CourseGrade $courseGrade): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, CourseGrade $courseGrade): bool
-    {
-        return false;
+        return $user->isTrackAdmin();
     }
 }
