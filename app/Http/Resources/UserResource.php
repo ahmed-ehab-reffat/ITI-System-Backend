@@ -19,6 +19,13 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $cohortId = null;
+        if ($this->resource->isStudent()) {
+            $cohortId = $this->resource->labGroups()->first()?->cohort_id;
+        } elseif ($this->resource->isInstructor()) {
+            $cohortId = $this->resource->engagements()->first()?->cohort_id;
+        }
+
         return [
             'id'                => $this->resource->id,
             'name'              => $this->resource->name,
@@ -27,6 +34,7 @@ class UserResource extends JsonResource
             'compensation_type' => $this->resource->compensation_type,
             'fixed_salary'      => $this->resource->fixed_salary ? (float) $this->resource->fixed_salary : null,
             'hourly_rate'       => $this->resource->hourly_rate ? (float) $this->resource->hourly_rate : null,
+            'cohort_id'         => $cohortId,
             'expires_at'        => $this->resource->expires_at?->format('Y-m-d H:i:s'),
             'created_at'        => $this->resource->created_at?->format('Y-m-d H:i:s'),
         ];
