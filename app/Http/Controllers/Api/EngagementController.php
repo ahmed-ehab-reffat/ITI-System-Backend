@@ -22,9 +22,20 @@ class EngagementController extends Controller
         $this->authorize('viewAny', Engagement::class);
 
         $perPage = $request->integer('per_page', 15);
+        $type = $request->input('type');
+        $instructorId = $request->input('instructor_id');
 
-        $engagements = $cohort->engagements()
-            ->with(['instructor', 'labGroup'])
+        $query = $cohort->engagements();
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($instructorId) {
+            $query->where('instructor_id', $instructorId);
+        }
+
+        $engagements = $query->with(['instructor', 'labGroup'])
             ->paginate($perPage);
 
         return EngagementResource::collection($engagements);
