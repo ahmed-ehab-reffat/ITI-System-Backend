@@ -14,6 +14,18 @@ class StudentTagResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id'         => $this->id,
+            'tag_type'   => $this->tag_type,
+            'tag_value'  => $this->tag_value,
+            'note'       => $this->note,
+            'tagged_by'  => $this->whenLoaded('tagger', function () {
+                return [
+                    'id'   => $this->tagger->id,
+                    'name' => $this->tagger->name,
+                ];
+            }),
+            'created_at' => $this->created_at?->toDateTimeString(),
+        ];
     }
 }

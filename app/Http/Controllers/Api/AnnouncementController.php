@@ -3,47 +3,54 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Announcement\StoreAnnouncementRequest;
+use App\Http\Resources\AnnouncementResource;
+use App\Models\Announcement;
+use App\Models\Cohort;
+use Illuminate\Http\JsonResponse;
 
 class AnnouncementController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // GET /cohorts/{cohort}/announcements
+    public function index(Cohort $cohort)
     {
-        //
+        $announcements = $cohort->announcements()->with('author')->latest()->get();
+        return AnnouncementResource::collection($announcements);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // POST /cohorts/{cohort}/announcements
+    public function store(StoreAnnouncementRequest $request, Cohort $cohort)
     {
-        //
+        $this->authorize('create', Announcement::class);
+
+        $announcement = $cohort->announcements()->create([
+            'author_id' => auth()->id(),
+            'title'     => $request->title,
+            'body'      => $request->body,
+        ]);
+
+        return new AnnouncementResource($announcement->load('author'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // GET /announcements/{announcement}
+    public function show(Announcement $announcement)
     {
-        //
+        return new AnnouncementResource($announcement->load('author', 'cohort'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // PUT /announcements/{announcement}
+    public function update(StoreAnnouncementRequest $request, Announcement $announcement)
     {
-        //
+        $this->authorize('update', $announcement);
+        $announcement->update($request->only('title', 'body'));
+        return new AnnouncementResource($announcement);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    // DELETE /announcements/{announcement}
+    public function destroy(Announcement $announcement): JsonResponse
     {
-        //
+        $this->authorize('delete', $announcement);
+        $announcement->delete();
+        return response()->json(['message' => 'Announcement deleted.']);
     }
 }

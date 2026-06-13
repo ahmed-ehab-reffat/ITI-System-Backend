@@ -3,47 +3,57 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Tag\StoreTagRequest;
+use App\Http\Resources\StudentTagResource;
+use App\Models\StudentTag;
+use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class StudentTagController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // GET /students/{user}/tags
+    public function index(User $student): AnonymousResourceCollection
     {
-        //
+        $this->authorize('viewAny', StudentTag::class);
+
+        $tags = $student->tags()->with('tagger')->get();
+        return StudentTagResource::collection($tags);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // POST /students/{user}/tags
+    public function store(StoreTagRequest $request, User $student): StudentTagResource
     {
-        //
+        $this->authorize('create', StudentTag::class);
+
+        // ACC-5: Instructor can only tag their own lab group's students
+        if (auth()->user()->isInstructor()) {
+            $instructorGroupStudentIds = auth()->user()
+                ->engagements()
+                ->with('labGroup.students')
+                ->get()
+                ->flatMap(fn($e) => $e->labGroup?->students->pluck('id') ?? []);
+
+            abort_unless($instructorGroupStudentIds->contains($student->id), 403,
+                'You can only tag students in your lab group.');
+        }
+
+        $tag = $student->tags()->create([
+            'tagged_by'  => auth()->id(),
+            'cohort_id'  => $request->cohort_id,
+            'tag_type'   => $request->tag_type,
+            'tag_value'  => $request->tag_value,
+            'note'       => $request->note,
+        ]);
+
+        return new StudentTagResource($tag);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // DELETE /students/{user}/tags/{tag}
+    public function destroy(User $student, StudentTag $tag): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $this->authorize('delete', $tag);
+        $tag->delete();
+        return response()->json(['message' => 'Tag removed.']);
     }
 }
