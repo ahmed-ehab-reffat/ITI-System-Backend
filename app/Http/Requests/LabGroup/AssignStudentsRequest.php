@@ -4,6 +4,7 @@ namespace App\Http\Requests\LabGroup;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AssignStudentsRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class AssignStudentsRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->isTrackAdmin();
     }
 
     /**
@@ -23,7 +24,13 @@ class AssignStudentsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => [
+                'uuid',
+                Rule::exists('users', 'id')->where(function ($query) {
+                    $query->where('role', 'student');
+                }),
+            ],
         ];
     }
 }

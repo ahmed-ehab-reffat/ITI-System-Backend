@@ -13,7 +13,7 @@ class AnnouncementPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class AnnouncementPolicy
      */
     public function view(User $user, Announcement $announcement): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,6 +29,14 @@ class AnnouncementPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->isTrackAdmin() || $user->isBranchManager()) return true;
+
+        if ($user->isInstructor()) {
+            return $user->engagements()
+                ->where('starts_at', '<=', now()->toDateString())
+                ->where('ends_at', '>=', now()->toDateString())
+                ->exists();
+        }
         return false;
     }
 
@@ -37,7 +45,7 @@ class AnnouncementPolicy
      */
     public function update(User $user, Announcement $announcement): bool
     {
-        return false;
+        return $announcement->author_id === $user->id || $user->isTrackAdmin();
     }
 
     /**
@@ -45,7 +53,7 @@ class AnnouncementPolicy
      */
     public function delete(User $user, Announcement $announcement): bool
     {
-        return false;
+        return $announcement->author_id === $user->id || $user->isTrackAdmin();
     }
 
     /**

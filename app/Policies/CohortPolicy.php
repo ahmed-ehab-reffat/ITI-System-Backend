@@ -13,7 +13,7 @@ class CohortPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isBranchManager() || $user->isTrackAdmin();
     }
 
     /**
@@ -21,6 +21,14 @@ class CohortPolicy
      */
     public function view(User $user, Cohort $cohort): bool
     {
+        if ($user->isBranchManager()) {
+            return true;
+        }
+
+        if ($user->isTrackAdmin()) {
+            return $cohort->trackAdmins()->where('users.id', $user->id)->exists();
+        }
+
         return false;
     }
 
@@ -29,7 +37,7 @@ class CohortPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isBranchManager();
     }
 
     /**
@@ -37,7 +45,7 @@ class CohortPolicy
      */
     public function update(User $user, Cohort $cohort): bool
     {
-        return false;
+        return $user->isBranchManager();
     }
 
     /**
@@ -45,7 +53,7 @@ class CohortPolicy
      */
     public function delete(User $user, Cohort $cohort): bool
     {
-        return false;
+        return $user->isBranchManager();
     }
 
     /**
@@ -53,7 +61,7 @@ class CohortPolicy
      */
     public function restore(User $user, Cohort $cohort): bool
     {
-        return false;
+        return $user->isBranchManager();
     }
 
     /**
@@ -61,6 +69,6 @@ class CohortPolicy
      */
     public function forceDelete(User $user, Cohort $cohort): bool
     {
-        return false;
+        return $user->isBranchManager();
     }
 }

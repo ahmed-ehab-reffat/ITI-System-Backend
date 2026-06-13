@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreEngagementRequest extends FormRequest
+class UpdateEngagementRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,27 +25,34 @@ class StoreEngagementRequest extends FormRequest
     {
         return [
             'instructor_id' => [
-                'required', 'uuid',
+                'sometimes', 'uuid',
                 Rule::exists('users', 'id')->where(function ($query) {
-                    $query->whereIn('role', ['instructor', 'track_admin']);
+                    $query->where('role', 'instructor');
                 }),
             ],
-            'type' => ['required', 'string', 'in:lecture,lab'],
+            'type' => ['sometimes', 'string', 'in:lecture,lab'],
             'lab_group_id' => [
                 'nullable', 'uuid',
                 Rule::exists('lab_groups', 'id'),
             ],
-            'starts_at' => ['required', 'date'],
-            'ends_at' => ['required', 'date', 'after:starts_at'],
-            'hours_per_session' => ['required', 'numeric', 'min:0.5', 'max:12'],
+            'starts_at' => ['sometimes', 'date'],
+            'ends_at' => ['sometimes', 'date', 'after:starts_at'],
+            'hours_per_session' => ['sometimes', 'numeric', 'min:0.5', 'max:12'],
         ];
     }
 
-    // ENG-3: lab_group_id is required when type is lab
+    // ENG-3: lab_group_id is required when type is lab (re-check on partial update)
     public function withValidator($validator): void
     {
         $validator->after(function ($v) {
-            if ($this->input('type') === 'lab' && empty($this->input('lab_group_id'))) {
+            $engagement = $this->route('engagement');
+
+            $type = $this->input('type', $engagement->type);
+            $labGroupId = $this->has('lab_group_id')
+                ? $this->input('lab_group_id')
+                : $engagement->lab_group_id;
+
+            if ($type === 'lab' && empty($labGroupId)) {
                 $v->errors()->add('lab_group_id', 'lab_group_id is required when type is lab.');
             }
         });

@@ -85,9 +85,9 @@ Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
     Route::post('grades/{grade}/override',  [GradeOverrideController::class, 'store']);
 
     // Student Tags
-    Route::get('students/{user}/tags',              [StudentTagController::class, 'index']);
-    Route::post('students/{user}/tags',             [StudentTagController::class, 'store']);
-    Route::delete('students/{user}/tags/{tag}',     [StudentTagController::class, 'destroy']);
+    Route::get('students/{student}/tags',              [StudentTagController::class, 'index']);
+    Route::post('students/{student}/tags',             [StudentTagController::class, 'store']);
+    Route::delete('students/{student}/tags/{tag}',     [StudentTagController::class, 'destroy']);
 
     // Announcements
     Route::apiResource('cohorts.announcements', AnnouncementController::class)->shallow();

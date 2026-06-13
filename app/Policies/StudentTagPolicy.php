@@ -13,7 +13,7 @@ class StudentTagPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return in_array($user->role, ['track_admin', 'branch_manager', 'instructor']);
     }
 
     /**
@@ -21,7 +21,7 @@ class StudentTagPolicy
      */
     public function view(User $user, StudentTag $studentTag): bool
     {
-        return false;
+        return in_array($user->role, ['track_admin', 'branch_manager', 'instructor']);
     }
 
     /**
@@ -29,7 +29,7 @@ class StudentTagPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return in_array($user->role, ['track_admin', 'instructor']);
     }
 
     /**
@@ -45,7 +45,8 @@ class StudentTagPolicy
      */
     public function delete(User $user, StudentTag $studentTag): bool
     {
-        return false;
+        if ($user->isTrackAdmin()) return true;
+        return $studentTag->tagged_by === $user->id;
     }
 
     /**

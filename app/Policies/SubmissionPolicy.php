@@ -2,65 +2,72 @@
 
 namespace App\Policies;
 
+use App\Models\Session;
 use App\Models\Submission;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class SubmissionPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    public function viewAny(User $user): bool
+    public function viewAny(User $user, Session $session): bool
     {
-        return false;
+        return match ($user->role) {
+            'branch_manager', 'track_admin' => true,
+            'instructor' => $session->engagement->instructor_id === $user->id,
+            default      => false,
+        };
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Submission $submission): bool
     {
-        return false;
+        if ($user->isStudent()) {
+            return $submission->student_id === $user->id;
+        }
+
+        $session = $submission->session;
+
+        return match ($user->role) {
+            'branch_manager', 'track_admin' => true,
+            'instructor' => $session->engagement->instructor_id === $user->id,
+            default      => false,
+        };
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(User $user, Session $session): bool
     {
-        return false;
+        return $user->isStudent();
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Submission $submission): bool
+    // GRD-4: instructors grade only their assigned lab group
+    public function grade(User $user, Submission $submission): bool
     {
-        return false;
+        if (! $user->isInstructor()) {
+            return false;
+        }
+
+        $engagement = $submission->session->engagement;
+
+        if ($engagement->instructor_id !== $user->id) {
+            return false;
+        }
+
+        $labGroupId = $engagement->lab_group_id;
+
+        if (! $labGroupId) {
+            return false;
+        }
+
+        return $submission->student
+            ->labGroups()
+            ->where('lab_groups.id', $labGroupId)
+            ->exists();
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Submission $submission): bool
+    public function viewStudentSubmissions(User $user, User $student): bool
     {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Submission $submission): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Submission $submission): bool
-    {
-        return false;
+        return match ($user->role) {
+            'branch_manager', 'track_admin', 'instructor' => true,
+            'student' => $user->id === $student->id,
+            default   => false,
+        };
     }
 }
