@@ -31,9 +31,18 @@ class BillingController extends Controller
         abort_unless(auth()->user()->isBranchManager(), 403);
 
         $records = BillingRecord::where('user_id', $user->id)
-            ->with('session.engagement')
+            ->with(['session.engagement.labGroup', 'user'])
             ->get();
 
-        return BillingRecordResource::collection($records);
+        $rollup = $this->billing->rollupForUser($user);
+
+        return response()->json([
+            'instructor_name' => $user->name,
+            'type'            => $user->compensation_type,
+            'summary'         => [
+                'total_due' => $rollup['total_due'],
+            ],
+            'sessions'        => BillingRecordResource::collection($records),
+        ]);
     }
 }
