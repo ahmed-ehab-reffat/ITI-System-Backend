@@ -13,7 +13,7 @@ class AttendanceLedgerController extends Controller
    //  Returns the student's current balance plus a full chronological history built from their attendance records.
     public function show(User $user): AttendanceLedgerResource
     {
-       // $this->authorize('view', [AttendanceLedger::class, $user]);
+        $this->authorize('view', [AttendanceLedger::class, $user]);
 
         $ledgers = AttendanceLedger::where('student_id', $user->id)
             ->with('cohort')
