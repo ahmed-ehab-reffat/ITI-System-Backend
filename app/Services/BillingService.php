@@ -44,10 +44,11 @@ class BillingService
         }
 
         return [
-            'person_type' => $user->compensation_type,
-            'total_hours' => $totalHours,
-            'total_due'   => $total,
-            'sessions'    => $records,
+            'instructor_id'   => $user->id,
+            'instructor_name' => $user->name,
+            'type'            => $user->compensation_type,
+            'total_hours'     => $totalHours,
+            'total_due'       => $total,
         ];
     }
 }

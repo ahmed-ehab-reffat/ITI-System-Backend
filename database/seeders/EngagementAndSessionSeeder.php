@@ -42,10 +42,17 @@ class EngagementAndSessionSeeder extends Seeder
         // Seed 3 delivered sessions for each engagement
         foreach ([$lecture, $lab] as $engagement) {
             for ($i = 0; $i < 3; $i++) {
-                SessionModel::create([
+                $session = SessionModel::create([
                     'engagement_id' => $engagement->id,
                     'session_date'  => now()->subWeeks(3)->addDays($i * 7),
                     'is_delivered'  => true,
+                ]);
+
+                \App\Models\BillingRecord::create([
+                    'session_id'  => $session->id,
+                    'user_id'     => $engagement->instructor_id,
+                    'hours'       => $engagement->hours_per_session,
+                    'person_type' => $instructor->compensation_type ?? 'external',
                 ]);
             }
         }
