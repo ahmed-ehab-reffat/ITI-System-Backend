@@ -79,4 +79,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(StudentTag::class, 'student_id');
     }
+
+    public function billingRecords(): HasMany
+    {
+        return $this->hasMany(BillingRecord::class, 'user_id');
+    }
 }

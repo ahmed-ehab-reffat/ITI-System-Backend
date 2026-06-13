@@ -30,6 +30,7 @@ class CohortControllerTest extends TestCase
         $this->track = Track::create([
             'id' => \Illuminate\Support\Str::uuid(),
             'name' => 'Web Development',
+            'code' => 'WD',
             'description' => 'Full-stack web track',
         ]);
     }

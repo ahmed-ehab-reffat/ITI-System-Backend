@@ -14,6 +14,7 @@ class TrackAndCohortSeeder extends Seeder
     {
         $track = Track::create([
             'name' => 'Web Development',
+            'code' => 'WD',
             'description' => 'Full-stack web track',
         ]);
 
