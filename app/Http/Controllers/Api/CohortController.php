@@ -22,13 +22,25 @@ class CohortController extends Controller
 
         $user = $request->user();
         $perPage = $request->integer('per_page', 15);
+        $status = $request->input('status');
+        $trackId = $request->input('track_id');
 
         if ($user->isBranchManager()) {
-            $cohorts = Cohort::with(['track', 'trackAdmins'])->paginate($perPage);
+            $query = Cohort::query();
         } else {
             // track_admin (since viewAny only allows branch_manager and track_admin)
-            $cohorts = $user->managedCohorts()->with(['track', 'trackAdmins'])->paginate($perPage);
+            $query = $user->managedCohorts();
         }
+
+        if ($status) {
+            $query->where('status', $status);
+        }
+
+        if ($trackId) {
+            $query->where('track_id', $trackId);
+        }
+
+        $cohorts = $query->with(['track', 'trackAdmins'])->paginate($perPage);
 
         return CohortResource::collection($cohorts);
     }
