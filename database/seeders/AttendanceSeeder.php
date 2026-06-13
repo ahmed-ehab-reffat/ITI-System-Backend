@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AttendanceLedger;
 use App\Models\AttendanceRecord;
 use App\Models\ExcuseRequest;
 use App\Models\Session;
@@ -12,37 +13,48 @@ class AttendanceSeeder extends Seeder
 {
     public function run(): void
     {
-        $sessions = Session::with('engagement.cohort')->get();
-        $students = User::where('role', 'student')->get();
+        $sessions = Session::where('is_delivered', true)
+            ->with('engagement.cohort')
+            ->get();
 
-        foreach ($sessions as $sessionKey => $session) {
+        $admin = User::where('role', 'track_admin')->first();
+
+        foreach ($sessions as $session) {
             $engagement = $session->engagement;
-            $cohort = $engagement->cohort;
+            $cohort     = $engagement->cohort;
 
-            // Determine students eligible for this session
+            // Scope students: lab engagement → lab group only, else → full cohort
             if ($engagement->lab_group_id) {
-                // Only students in the engagement's lab group
-                $eligibleStudents = User::whereHas('labGroups', function ($query) use ($engagement) {
-                    $query->where('lab_groups.id', $engagement->lab_group_id);
+                $students = User::whereHas('labGroups', function ($q) use ($engagement) {
+                    $q->where('lab_groups.id', $engagement->lab_group_id);
                 })->get();
             } else {
-                // All students in the cohort (via attendance ledger or just all students for local simplicity)
-                $eligibleStudents = $students;
+                // Query AttendanceLedger directly — no relationship needed on User model
+                $studentIds = AttendanceLedger::where('cohort_id', $cohort->id)
+                    ->pluck('student_id');
+                $students = User::whereIn('id', $studentIds)->get();
             }
 
-            foreach ($eligibleStudents as $index => $student) {
-                // Make student 1 present, student 2 absent, etc., or randomly
-                $status = 'present';
-                $arrivedAt = null;
-                $leftAt = null;
+            foreach ($students as $index => $student) {
+                $bucket = $index % 10;
 
-                if ($index === 0 && $sessionKey % 2 === 0) {
-                    $status = 'absent';
-                } elseif ($index === 1 && $sessionKey % 2 === 1) {
-                    $status = 'excused';
-                } else {
-                    $arrivedAt = now()->subWeeks(3)->setTime(9, rand(0, 15), 0);
-                    $leftAt = now()->subWeeks(3)->setTime(12, rand(0, 5), 0);
+                $status = match (true) {
+                    $bucket <= 6  => 'present',
+                    $bucket === 7 => 'absent',
+                    $bucket === 8 => 'excused',
+                    $bucket === 9 => 'absent',
+                    default       => 'present',
+                };
+
+                $arrivedAt = null;
+                $leftAt    = null;
+
+                if ($status === 'present') {
+                    $base      = $session->session_date instanceof \Carbon\Carbon
+                        ? $session->session_date
+                        : \Carbon\Carbon::parse($session->session_date);
+                    $arrivedAt = (clone $base)->setTime(9, rand(0, 20));
+                    $leftAt    = (clone $base)->setTime(12, rand(0, 15));
                 }
 
                 $record = AttendanceRecord::create([
@@ -53,13 +65,46 @@ class AttendanceSeeder extends Seeder
                     'status'     => $status,
                 ]);
 
-                if ($status === 'excused') {
+                // ── Ledger update (ATT-5) ────────────────────────────────────────
+                $deduction = match ($status) {
+                    'absent'  => -25,
+                    'excused' => -5,
+                    default   => 0,
+                };
+
+                if ($deduction !== 0) {
+                    AttendanceLedger::where('student_id', $student->id)
+                        ->where('cohort_id', $cohort->id)
+                        ->decrement('balance', abs($deduction));
+                }
+
+                // ── Excuse requests ──────────────────────────────────────────────
+                if ($bucket === 8) {
                     ExcuseRequest::create([
                         'attendance_record_id' => $record->id,
                         'student_id'           => $student->id,
-                        'reason'               => 'Medical appointment',
-                        'attachment_path'      => 'excuses/medical.pdf',
+                        'reason'               => 'Family emergency — hospital visit confirmed with documentation.',
+                        'attachment_path'      => null,
+                        'status'               => 'approved',
+                        'reviewed_by'          => $admin->id,
+                        'reviewer_note'        => 'Medical documentation verified. Excuse approved.',
+                    ]);
+
+                    // Refund 20 points (net -5 instead of -25)
+                    AttendanceLedger::where('student_id', $student->id)
+                        ->where('cohort_id', $cohort->id)
+                        ->increment('balance', 20);
+                }
+
+                if ($bucket === 9) {
+                    ExcuseRequest::create([
+                        'attendance_record_id' => $record->id,
+                        'student_id'           => $student->id,
+                        'reason'               => 'I had a medical appointment that could not be rescheduled.',
+                        'attachment_path'      => null,
                         'status'               => 'requested',
+                        'reviewed_by'          => null,
+                        'reviewer_note'        => null,
                     ]);
                 }
             }
