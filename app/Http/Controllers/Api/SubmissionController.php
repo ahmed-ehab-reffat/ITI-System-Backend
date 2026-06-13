@@ -13,6 +13,7 @@ use App\Services\LatePenaltyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Storage;
 
 class SubmissionController extends Controller
 {
@@ -51,7 +52,7 @@ class SubmissionController extends Controller
         $url          = $request->input('url');
 
         if ($request->hasFile('file')) {
-            $filePath = $request->file('file')->store('submissions', 'local');
+            $filePath = $request->file('file')->store('submissions', 's3');
             $url      = null;
         }
 
@@ -99,5 +100,23 @@ class SubmissionController extends Controller
             ->get();
 
         return SubmissionResource::collection($submissions);
+    }
+
+    public function file(Session $session, Submission $submission): JsonResponse
+    {
+        abort_if($submission->session_id !== $session->id, 404);
+
+        $this->authorize('view', $submission);
+
+        if (!$submission->file_path) {
+            return response()->json(['message' => 'No file found.'], 404);
+        }
+
+        $url = Storage::disk('s3')->temporaryUrl(
+            $submission->file_path,
+            now()->addMinutes(5)
+        );
+
+        return response()->json(['url' => $url]);
     }
 }

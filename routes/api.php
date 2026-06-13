@@ -67,9 +67,11 @@ Route::middleware(['auth:sanctum', 'account.active'])->group(function () {
     Route::apiResource('excuse-requests', ExcuseRequestController::class)->except(['update', 'destroy']);
     Route::patch('excuse-requests/{excuseRequest}/approve', [ExcuseRequestController::class, 'approve']);
     Route::patch('excuse-requests/{excuseRequest}/reject',  [ExcuseRequestController::class, 'reject']);
+    Route::get('excuse-requests/{excuseRequest}/attachment', [ExcuseRequestController::class, 'attachment']);
 
     // Submissions
     Route::get('sessions/{session}/submissions',                      [SubmissionController::class, 'index']);
+    Route::get('sessions/{session}/submissions/{submission}/file',    [SubmissionController::class, 'file']);
     Route::post('sessions/{session}/submissions',                     [SubmissionController::class, 'store']);
     Route::patch('sessions/{session}/submissions/{submission}/grade', [SubmissionController::class, 'grade']);
     Route::get('students/{user}/submissions',                         [SubmissionController::class, 'studentIndex']);

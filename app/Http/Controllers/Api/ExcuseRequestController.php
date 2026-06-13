@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ExcuseRequestController extends Controller
 {
@@ -50,7 +51,7 @@ class ExcuseRequestController extends Controller
         $attachmentPath = null;
 
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('excuse-attachments', 'local');
+            $attachmentPath = $request->file('attachment')->store('excuses', 's3');
         }
 
         $excuse = ExcuseRequest::create([
@@ -125,5 +126,21 @@ class ExcuseRequestController extends Controller
         return response()->json(
             new ExcuseRequestResource($excuseRequest->load(['student', 'attendanceRecord', 'reviewer'])),
         );
+    }
+
+    public function attachment(ExcuseRequest $excuseRequest): JsonResponse
+    {
+        $this->authorize('view', $excuseRequest);
+
+        if (!$excuseRequest->attachment_path) {
+            return response()->json(['message' => 'No attachment found.'], 404);
+        }
+
+        $url = Storage::disk('s3')->temporaryUrl(
+            $excuseRequest->attachment_path,
+            now()->addMinutes(5)
+        );
+
+        return response()->json(['url' => $url]);
     }
 }

@@ -15,14 +15,14 @@ class BillingRecordResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'session_date' => $this->whenLoaded('session', fn() => $this->session->session_date),
-            'hours'        => $this->hours,
-            'person_type'  => $this->person_type,
-            'rate'         => $this->whenLoaded('user', fn() => $this->user->hourly_rate),
-            'amount_due'   => $this->person_type === 'external' && $this->relationLoaded('user')
-                ? $this->hours * $this->user->hourly_rate
-                : null,
+            'id'         => $this->id,
+            'date'       => $this->whenLoaded('session', fn() => \Carbon\Carbon::parse($this->session->session_date)->format('M d, Y')),
+            'engagement' => $this->whenLoaded('session', fn() => ucfirst($this->session->engagement->type) . ' - ' . ($this->session->engagement->labGroup->name ?? 'Lecture')),
+            'hours'      => $this->hours,
+            'rate'       => $this->whenLoaded('user', fn() => $this->user->hourly_rate ?? 0),
+            'amount'     => $this->person_type === 'external' && $this->relationLoaded('user')
+                ? $this->hours * ($this->user->hourly_rate ?? 0)
+                : 0,
         ];
     }
 }
