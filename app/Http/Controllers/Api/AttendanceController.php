@@ -22,7 +22,7 @@ class AttendanceController extends Controller
      // List all attendance records for a session.
     public function index(Session $session): AnonymousResourceCollection
     {
-       // $this->authorize('viewAny', [AttendanceRecord::class, $session]);
+       $this->authorize('viewAny', [AttendanceRecord::class, $session]);
 
         $user    = auth()->user();
         $records = $session->attendanceRecords()->with('student');
@@ -45,7 +45,7 @@ class AttendanceController extends Controller
      
     public function store(StoreAttendanceRequest $request, Session $session): AnonymousResourceCollection
     {
-        // $this->authorize('create', [AttendanceRecord::class, $session]);
+        $this->authorize('create', [AttendanceRecord::class, $session]);
 
         $cohortId = $session->engagement->cohort_id;
         $created  = collect();
@@ -78,7 +78,7 @@ class AttendanceController extends Controller
         Session $session,
         AttendanceRecord $record,
     ): AttendanceRecordResource {
-      //  $this->authorize('update', $record);
+       $this->authorize('update', $record);
 
         $oldStatus = $record->status;
         $newData   = $request->validated();
@@ -102,7 +102,7 @@ class AttendanceController extends Controller
    
     public function studentHistory(User $user): AnonymousResourceCollection
     {
-     //   $this->authorize('viewHistory', [AttendanceRecord::class, $user]);
+       $this->authorize('viewHistory', [AttendanceRecord::class, $user]);
 
         $records = AttendanceRecord::with(['session.engagement.cohort'])
             ->where('student_id', $user->id)

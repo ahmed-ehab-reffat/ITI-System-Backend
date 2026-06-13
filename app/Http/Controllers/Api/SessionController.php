@@ -21,7 +21,7 @@ class SessionController extends Controller
      
     public function index(Engagement $engagement): AnonymousResourceCollection
     {
-       // $this->authorize('viewAny', [Session::class, $engagement]);
+       $this->authorize('viewAny', [Session::class, $engagement]);
 
         $sessions = $engagement->sessions()->orderBy('session_date')->get();
 
@@ -31,7 +31,7 @@ class SessionController extends Controller
      // Track admin creates a session inside an engagement.
     public function store(StoreSessionRequest $request, Engagement $engagement): SessionResource
     {
-       // $this->authorize('create', [Session::class, $engagement]);
+        $this->authorize('create', [Session::class, $engagement]);
 
         $session = $engagement->sessions()->create($request->validated());
 
@@ -41,7 +41,7 @@ class SessionController extends Controller
      // Show a single session (shallow route).
     public function show(Session $session): SessionResource
     {
-      //  $this->authorize('view', $session);
+        $this->authorize('view', $session);
 
         return new SessionResource($session->load('engagement'));
     }
@@ -64,7 +64,7 @@ class SessionController extends Controller
      
     public function deliver(Session $session): SessionResource
     {
-       // $this->authorize('deliver', $session);
+       $this->authorize('deliver', $session);
 
         abort_if($session->is_delivered, 422, __('messages.session_already_delivered'));
 
