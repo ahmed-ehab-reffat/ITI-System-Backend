@@ -7,7 +7,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class AttendanceLedgerResource extends JsonResource
 {
- 
     public function toArray(Request $request): array
     {
         $student = $this->resource['student'];
@@ -19,6 +18,9 @@ class AttendanceLedgerResource extends JsonResource
                 'id'   => $student->id,
                 'name' => $student->name,
             ],
+
+            'total_balance' => $ledgers->sum('balance'),
+
             'ledgers' => $ledgers->map(fn ($ledger) => [
                 'cohort_id'   => $ledger->cohort_id,
                 'cohort_name' => $ledger->cohort?->name,
@@ -26,6 +28,7 @@ class AttendanceLedgerResource extends JsonResource
                 'max_balance' => 250,
                 'updated_at'  => $ledger->updated_at,
             ]),
+
             'history' => $history,
         ];
     }
