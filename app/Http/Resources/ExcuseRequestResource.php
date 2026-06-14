@@ -10,19 +10,24 @@ class ExcuseRequestResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                   => $this->id,
+            'id' => $this->id,
+            'student_name' => $this->student?->name,
+            'session_date' => $this->attendanceRecord?->session?->session_date,
             'attendance_record_id' => $this->attendance_record_id,
-            'student_id'           => $this->student_id,
-            'reason'               => $this->reason,
-            'attachment_path'      => $this->attachment_path,
-            'status'               => $this->status,
-            'reviewed_by'          => $this->reviewed_by,
-            'reviewer_note'        => $this->reviewer_note,
-            'created_at'           => $this->created_at,
-            'updated_at'           => $this->updated_at,
-            'student'              => new UserResource($this->whenLoaded('student')),
-            'attendance_record'    => new AttendanceRecordResource($this->whenLoaded('attendanceRecord')),
-            'reviewer'             => new UserResource($this->whenLoaded('reviewer')),
+            'reason' => $this->reason,
+            'status' => $this->status,
+            'attachment_url' => $this->attachment_path
+                ? asset('storage/' . $this->attachment_path)
+                : null,
+
+            'reviewer_note' => $this->reviewer_note,
+            'reviewed_by' => $this->reviewed_by,
+            'reviewer_name' => $this->reviewer?->name,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'student' => $this->whenLoaded('student'),
+            'attendance_record' => $this->whenLoaded('attendanceRecord'),
+            'reviewer' => $this->whenLoaded('reviewer'),
         ];
     }
 }
