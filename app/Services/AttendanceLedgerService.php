@@ -24,9 +24,14 @@ class AttendanceLedgerService
         if ($amount === 0) {
             return; 
         }
+        
+        if ($amount < 0) {
+            $amount = -$amount; 
+        }
 
         $ledger = $this->ledgerFor($student, $cohortId);
-        $ledger->decrement('balance', $amount);
+        $newBalance = max(0, $ledger->balance - $amount);
+        $ledger->update(['balance' => $newBalance]);
     }
 
     public function adjustForStatusChange(
@@ -40,8 +45,11 @@ class AttendanceLedgerService
         }
 
         $ledger = $this->ledgerFor($record->student, $cohortId);
-        $ledger->increment('balance', $this->deductionFor($oldStatus));
-        $ledger->decrement('balance', $this->deductionFor($newStatus));
+        $diff = $this->deductionFor($oldStatus) - $this->deductionFor($newStatus);
+        
+        $maxBalance = config('attendance.starting_balance', 250);
+        $newBalance = min($maxBalance, max(0, $ledger->balance + $diff));
+        $ledger->update(['balance' => $newBalance]);
     }
 
     public function balance(User $student, string $cohortId): int
@@ -56,7 +64,9 @@ class AttendanceLedgerService
         }
 
         $ledger = $this->ledgerFor($student, $cohortId);
-        $ledger->increment('balance', $amount);
+        $maxBalance = config('attendance.starting_balance', 250);
+        $newBalance = min($maxBalance, max(0, $ledger->balance + $amount));
+        $ledger->update(['balance' => $newBalance]);
     }
 
     private function deductionFor(string $status): int

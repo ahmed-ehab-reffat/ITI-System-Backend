@@ -124,6 +124,10 @@ class CohortController extends Controller
     {
         $this->authorize('delete', $cohort);
 
+        // Cascade-delete student tags linked to this cohort before deleting it
+        // to avoid FK constraint violations on student_tags_cohort_id_foreign.
+        $cohort->studentTags()->delete();
+
         $cohort->delete();
 
         return response()->json(null, 204);

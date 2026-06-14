@@ -8,13 +8,15 @@ use App\Http\Resources\AnnouncementResource;
 use App\Models\Announcement;
 use App\Models\Cohort;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AnnouncementController extends Controller
 {
     // GET /cohorts/{cohort}/announcements
-    public function index(Cohort $cohort)
+    public function index(Request $request, Cohort $cohort)
     {
-        $announcements = $cohort->announcements()->with('author')->latest()->get();
+        $perPage = $request->integer('per_page', 10);
+        $announcements = $cohort->announcements()->with('author')->latest()->paginate($perPage);
         return AnnouncementResource::collection($announcements);
     }
 
@@ -43,7 +45,7 @@ class AnnouncementController extends Controller
     {
         $this->authorize('update', $announcement);
         $announcement->update($request->only('title', 'body'));
-        return new AnnouncementResource($announcement);
+        return new AnnouncementResource($announcement->load('author'));
     }
 
     // DELETE /announcements/{announcement}

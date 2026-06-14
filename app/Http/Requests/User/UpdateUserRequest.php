@@ -25,13 +25,15 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $targetUser = $this->route('user');
+        
         return [
             'name'  => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'sometimes',
                 'email',
                 'max:255',
-                Rule::unique('users', 'email')->ignore($this->user->id),
+                Rule::unique('users', 'email')->ignore($targetUser->id),
             ],
             'role'  => ['sometimes', 'string', Rule::in([
                 'branch_manager',
@@ -42,7 +44,7 @@ class UpdateUserRequest extends FormRequest
 
             'compensation_type' => [
                 Rule::requiredIf(fn (): bool => in_array(
-                    $this->input('role', $this->user->role),
+                    $this->input('role', $targetUser->role),
                     ['track_admin', 'instructor'],
                     true,
                 )),
@@ -53,7 +55,7 @@ class UpdateUserRequest extends FormRequest
 
             'hourly_rate' => [
                 Rule::requiredIf(fn (): bool => in_array(
-                    $this->input('role', $this->user->role),
+                    $this->input('role', $targetUser->role),
                     ['track_admin', 'instructor'],
                     true,
                 )),
@@ -63,8 +65,8 @@ class UpdateUserRequest extends FormRequest
             ],
 
             'fixed_salary' => [
-                Rule::requiredIf(fn (): bool => $this->input('role', $this->user->role) === 'instructor'
-                    && $this->input('compensation_type', $this->user->compensation_type) === 'internal'),
+                Rule::requiredIf(fn (): bool => $this->input('role', $targetUser->role) === 'instructor'
+                    && $this->input('compensation_type', $targetUser->compensation_type) === 'internal'),
                 'nullable',
                 'numeric',
                 'min:0',

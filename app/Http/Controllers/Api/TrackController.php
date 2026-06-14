@@ -12,9 +12,10 @@ class TrackController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tracks = Track::with('activeCohort')->get();
+        $perPage = $request->integer('per_page', 15);
+        $tracks = Track::with('activeCohort')->paginate($perPage);
         return TrackResource::collection($tracks);
     }
 

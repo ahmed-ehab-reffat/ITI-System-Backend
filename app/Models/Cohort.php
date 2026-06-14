@@ -59,4 +59,9 @@ class Cohort extends Model
     {
         return $this->hasMany(AttendanceLedger::class);
     }
+
+    public function studentTags(): HasMany
+    {
+        return $this->hasMany(StudentTag::class);
+    }
 }

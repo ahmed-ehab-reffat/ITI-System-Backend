@@ -18,9 +18,11 @@ class AnnouncementResource extends JsonResource
             'id'         => $this->id,
             'title'      => $this->title,
             'body'       => $this->body,
-            'author_id'  => $this->whenLoaded('author', fn() => $this->author->id),
-            'author_name'=> $this->whenLoaded('author', fn() => $this->author->name),
-            'author_role'=> $this->whenLoaded('author', fn() => $this->author->role),
+            'author'     => $this->whenLoaded('author', fn() => [
+                'id'   => $this->author->id,
+                'name' => $this->author->name,
+                'role' => $this->author->role,
+            ]),
             'cohort_id'  => $this->cohort_id,
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
