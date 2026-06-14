@@ -9,7 +9,10 @@ class EngagementPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true;
+        return match ($user->role) {
+            'branch_manager', 'track_admin', 'instructor', 'student' => true,
+            default => false,
+        };
     }
 
     public function view(User $user, Engagement $engagement): bool
