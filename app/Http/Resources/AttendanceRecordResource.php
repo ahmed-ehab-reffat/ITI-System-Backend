@@ -16,6 +16,7 @@ class AttendanceRecordResource extends JsonResource
                 'id'   => $this->student->id,
                 'name' => $this->student->name,
             ]),
+            'type' => $this->session->engagement->type ?? null,
             'arrived_at' => $this->arrived_at,
             'left_at'    => $this->left_at,
             'status'     => $this->status,
