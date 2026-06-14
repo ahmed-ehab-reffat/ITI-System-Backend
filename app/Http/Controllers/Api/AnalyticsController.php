@@ -56,13 +56,12 @@ class AnalyticsController extends Controller
         ]);
     }
 
-    // GET /analytics/instructor  — ACC-3: scoped to their lab group only
     public function instructor(Request $request)
     {
         $instructor = $request->user();
         abort_unless($instructor->isInstructor(), 403);
 
-        $engagements = $instructor->engagements()->with(['labGroup.students.submissions', 'labGroup.students.courseGrades', 'sessions.billingRecord'])->get();
+        $engagements = $instructor->engagements()->with(['cohort', 'labGroup.students.submissions', 'labGroup.students.courseGrades', 'sessions.billingRecord'])->get();
 
         $data = $engagements->map(function ($engagement) {
             $students = $engagement->labGroup?->students ?? collect();
@@ -86,11 +85,15 @@ class AnalyticsController extends Controller
                 'below_60' => $scores->filter(fn($s) => $s < 60)->count(),
             ];
 
-            $deliveredHours = $engagement->sessions->where('is_delivered', true)->flatMap->billingRecords->sum('hours') ?? 0;
+            $deliveredHours = $engagement->sessions
+                ->where('is_delivered', true)
+                ->sum(fn($s) => $s->billingRecord?->hours ?? 0);
 
             return [
                 'engagement_id' => $engagement->id,
                 'lab_group'     => $engagement->labGroup?->name,
+                'cohort_name'   => $engagement->cohort?->name,
+                'type'          => $engagement->type,
                 'student_count' => $students->count(),
                 'submissions'   => $students->flatMap->submissions->count(),
                 'grade_distribution' => $gradeDistribution,

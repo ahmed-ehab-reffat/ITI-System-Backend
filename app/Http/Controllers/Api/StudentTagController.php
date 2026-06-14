@@ -38,9 +38,13 @@ class StudentTagController extends Controller
                 'You can only tag students in your lab group.');
         }
 
+        $cohortId = $request->cohort_id ?? $student->labGroups()->first()?->cohort_id;
+
+        abort_unless($cohortId, 400, 'Could not determine the cohort for this student.');
+
         $tag = $student->tags()->create([
             'tagged_by'  => auth()->id(),
-            'cohort_id'  => $request->cohort_id,
+            'cohort_id'  => $cohortId,
             'tag_type'   => $request->tag_type,
             'tag_value'  => $request->tag_value,
             'note'       => $request->note,
