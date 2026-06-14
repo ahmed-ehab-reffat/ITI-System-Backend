@@ -14,7 +14,7 @@ class EngagementPolicy
     public function viewAny(User $user): bool
     {
         return match ($user->role) {
-            'branch_manager', 'track_admin', 'student' => true,
+            'branch_manager', 'track_admin', 'instructor', 'student' => true,
             default => false,
         };
     }

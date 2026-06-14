@@ -194,18 +194,50 @@ class AnalyticsController extends Controller
     {
         abort_unless(auth()->user()->isBranchManager(), 403);
 
-        $tracks = \App\Models\Track::with(['cohorts.labGroups.students.courseGrades'])->get();
+        $tracks = \App\Models\Track::with(['cohorts.labGroups.students.courseGrades', 'cohorts.labGroups.students.attendanceLedger'])->get();
 
-        $summary = $tracks->map(fn($track) => [
-            'track'         => $track->name,
-            'cohort_count'  => $track->cohorts->count(),
-            'student_count' => $track->cohorts->flatMap->labGroups->flatMap->students->unique('id')->count(),
-            'avg_score'     => round(
-                $track->cohorts->flatMap->labGroups->flatMap->students->flatMap->courseGrades->avg('computed_score'),
-                2
-            ),
+        $totalStudents = 0;
+        $activeCohorts = 0;
+        $instructorsCount = \App\Models\User::where('role', 'instructor')->count();
+        $atRiskCountTotal = 0;
+
+        $tracksData = $tracks->map(function ($track) use (&$totalStudents, &$activeCohorts, &$atRiskCountTotal) {
+            $trackCohortsCount = $track->cohorts->count();
+            
+            $students = $track->cohorts->flatMap->labGroups->flatMap->students->unique('id');
+            $trackStudentsCount = $students->count();
+            $totalStudents += $trackStudentsCount;
+
+            $avgLedger = $students->flatMap->attendanceLedger->avg('balance') ?? 0;
+            $attendanceAvg = min(100, max(0, (int) round(($avgLedger / 250) * 100)));
+
+            $atRiskForTrack = 0;
+            foreach ($students as $student) {
+                $ledger = $student->attendanceLedger->first();
+                $lowLedger = $ledger && $ledger->balance < 150;
+                $lowGrades = $student->courseGrades->contains(fn($g) => $g->computed_score < 60);
+                if ($lowLedger || $lowGrades) {
+                    $atRiskForTrack++;
+                    $atRiskCountTotal++;
+                }
+            }
+
+            return [
+                'id'             => $track->id,
+                'name'           => $track->name,
+                'cohorts_count'  => $trackCohortsCount,
+                'students_count' => $trackStudentsCount,
+                'attendance_avg' => $attendanceAvg,
+                'at_risk_count'  => $atRiskForTrack,
+            ];
+        });
+
+        return response()->json([
+            'total_students'       => $totalStudents,
+            'active_cohorts_count' => \App\Models\Cohort::where('status', 'active')->count(),
+            'at_risk_count'        => $atRiskCountTotal,
+            'instructors_count'    => $instructorsCount,
+            'tracks'               => $tracksData,
         ]);
-
-        return response()->json($summary);
     }
 }
