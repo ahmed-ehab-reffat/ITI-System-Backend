@@ -12,25 +12,36 @@ class CohortPolicy
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
-    {
-        return $user->isBranchManager() || $user->isTrackAdmin();
-    }
+{
+    return
+        $user->isBranchManager() ||
+        $user->isTrackAdmin() ||
+        $user->isInstructor();
+}
 
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Cohort $cohort): bool
-    {
-        if ($user->isBranchManager()) {
-            return true;
-        }
-
-        if ($user->isTrackAdmin()) {
-            return $cohort->trackAdmins()->where('users.id', $user->id)->exists();
-        }
-
-        return false;
+{
+    if ($user->isBranchManager()) {
+        return true;
     }
+
+    if ($user->isTrackAdmin()) {
+        return $cohort
+            ->trackAdmins()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
+
+    // Allow instructor access to their own cohort
+    if ($user->isInstructor()) {
+        return $user->cohort_id === $cohort->id;
+    }
+
+    return false;
+}
 
     /**
      * Determine whether the user can create models.

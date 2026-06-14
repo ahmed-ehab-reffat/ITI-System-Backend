@@ -8,20 +8,11 @@ use Illuminate\Auth\Access\Response;
 
 class EngagementPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return match ($user->role) {
-            'branch_manager', 'track_admin', 'student' => true,
-            default => false,
-        };
+        return true
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Engagement $engagement): bool
     {
         return match ($user->role) {
