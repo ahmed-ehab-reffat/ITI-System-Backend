@@ -1,0 +1,2878 @@
+{
+  "info": {
+    "name": "ITI Attendance & Grading Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "{01-Auth,02-Users,03-Tracks,04-Cohorts,05-Courses,06-Lab-Groups,07-Engagements,08-Sessions,09-Attendance,10-Ledger,11-Excuse-Requests,12-Submissions,13-Grades,14-Grade-Overrides,15-Student-Tags,16-Announcements,17-Billing,18-Analytics,19-QR}",
+      "item": []
+    },
+    {
+      "name": "01-Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "## Login\nAuthenticate and receive a Sanctum token.\nThe token is automatically saved to the `token` environment variable.\n\n**Test accounts:**\n- `manager@iti.test` / `password` → branch_manager\n- `trackadmin@iti.test` / `password` → track_admin\n- `instructor@iti.test` / `password` → instructor\n- `student1@iti.test` / `password` → student",
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@iti.test\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set(\"token\", pm.response.body.token);",
+                  "  pm.environment.set(\"user_id\", pm.response.body.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Logout\nRevokes the current Sanctum token.\nThe `token` environment variable is cleared automatically on success.",
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ],
+              "query": [],
+              "variable": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set(\"token\", \"\");",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Me\nReturns the currently authenticated user's profile including role and expiry date.",
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "## Login\nAuthenticate and receive a Sanctum token.\nThe token is automatically saved to the `token` environment variable.\n\n**Test accounts:**\n- `manager@iti.test` / `password` → branch_manager\n- `trackadmin@iti.test` / `password` → track_admin\n- `instructor@iti.test` / `password` → instructor\n- `student1@iti.test` / `password` → student",
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.web@iti.test\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set(\"token\", pm.response.body.token);",
+                  "  pm.environment.set(\"user_id\", pm.response.body.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login student",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "## Login\nAuthenticate and receive a Sanctum token.\nThe token is automatically saved to the `token` environment variable.\n\n**Test accounts:**\n- `manager@iti.test` / `password` → branch_manager\n- `trackadmin@iti.test` / `password` → track_admin\n- `instructor@iti.test` / `password` → instructor\n- `student1@iti.test` / `password` → student",
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"manager@iti.test\",\n  \"password\": \"password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.environment.set(\"token\", pm.response.body.token);",
+                  "  pm.environment.set(\"user_id\", pm.response.body.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02-Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Users\n**Access:** branch_manager only\n\n**Query params (optional):**\n- `role` — filter by: branch_manager, track_admin, instructor, student\n- `expired` — set to `true` to list only expired accounts",
+            "url": {
+              "raw": "{{base_url}}/users",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "instructor"
+                },
+                {
+                  "key": "expired",
+                  "value": "true"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create User\n**Access:** branch_manager (any role) · track_admin (instructor and student only)\n\nPasswords are auto-set to `Welcome@ITI1`. No self-registration (SEC-1).\n\n**Role values:** branch_manager · track_admin · instructor · student\n**Compensation types:** external · internal",
+            "url": {
+              "raw": "{{base_url}}/users",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mona Samir\",\n  \"email\": \"mona@iti.test\",\n  \"role\": \"instructor\",\n  \"compensation_type\": \"external\",\n  \"hourly_rate\": 150.00,\n  \"expires_at\": \"2027-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"user_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get User\n**Access:** branch_manager · track_admin (users in their cohort) · student (own profile only)",
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update User\n**Access:** branch_manager only\n\nSend only the fields you want to change.",
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mona Samir Updated\",\n  \"expires_at\": \"2027-06-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Deactivate User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Deactivate User\n**Access:** branch_manager only\n\nSets `expires_at = now()`. Does NOT hard-delete the account — all historical data is preserved.",
+            "url": {
+              "raw": "{{base_url}}/users/{{user_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "03-Tracks",
+      "item": [
+        {
+          "name": "List Tracks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Tracks\n**Access:** All roles\n\nReturns all tracks with their currently active cohort nested.",
+            "url": {
+              "raw": "{{base_url}}/tracks",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tracks"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Track",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Track\n**Access:** branch_manager only",
+            "url": {
+              "raw": "{{base_url}}/tracks",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tracks"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Web Development\",\n  \"description\": \"Full-stack web track covering Laravel and Vue\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"track_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Track",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Track\n**Access:** All roles\n\nReturns the track with full cohort history.",
+            "url": {
+              "raw": "{{base_url}}/tracks/{{track_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tracks",
+                "{{track_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update Track",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Track\n**Access:** branch_manager only",
+            "url": {
+              "raw": "{{base_url}}/tracks/{{track_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tracks",
+                "{{track_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Web Development Updated\",\n  \"description\": \"Updated description\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04-Cohorts",
+      "item": [
+        {
+          "name": "List Cohorts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Cohorts\n**Access:** branch_manager (all) · track_admin (own cohorts only)\n\n**Query params (optional):**\n- `track_id` — filter by track\n- `status` — open · active · closed",
+            "url": {
+              "raw": "{{base_url}}/cohorts",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts"
+              ],
+              "query": [
+                {
+                  "key": "track_id",
+                  "value": "019ec236-7f57-709a-bc74-709140ab7c82"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Cohort",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Cohort\n**Access:** branch_manager only (LC-2)\n\nReturns `409` if the track already has an active cohort (LC-1).\n\n`track_admin_ids` is optional — you can assign admins later via Update Cohort.",
+            "url": {
+              "raw": "{{base_url}}/cohorts",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"track_id\": \"{{track_id}}\",\n  \"name\": \"Intake 47\",\n  \"starts_at\": \"2026-01-15\",\n  \"ends_at\": \"2026-10-15\",\n  \"track_admin_ids\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"cohort_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Cohort",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Cohort\n**Access:** branch_manager · track_admin (own cohort)\n\nReturns full cohort detail including courses, lab groups, and track admins.",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update Cohort",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Cohort\n**Access:** branch_manager only\n\nUse this to change status (open → active → closed) and reassign track admins.\nOnly one cohort per track can be `active` at a time.",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\",\n  \"track_admin_ids\": [\"019eaa7f-3eee-714c-a6aa-c40dfa8581bd\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "05-Courses",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Courses\n**Access:** All roles in the cohort",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/courses",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "courses"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Course\n**Access:** track_admin only\n\n`lab_weight + exam_weight` MUST equal 100 — returns `422` otherwise (GRD-1).",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/courses",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "courses"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laravel Backend\",\n  \"lab_weight\": 40,\n  \"exam_weight\": 60\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"course_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Course",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Course\n**Access:** All roles in the cohort",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Course\n**Access:** track_admin only\n\nWeights must still sum to 100. Guard: cannot change weights after grades exist (GRD-2).",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Laravel Backend v2\",\n  \"lab_weight\": 50,\n  \"exam_weight\": 50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Delete Course\n**Access:** track_admin only",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "06-Lab-Groups",
+      "item": [
+        {
+          "name": "List Lab Groups",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Lab Groups\n**Access:** branch_manager · track_admin\n\nReturns all lab groups with their student lists.",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/lab-groups",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "lab-groups"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Lab Group",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Lab Group\n**Access:** track_admin only",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/lab-groups",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "lab-groups"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Group A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"lab_group_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Assign Students",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Assign Students to Lab Group\n**Access:** track_admin only\n\nFill `student_ids` with the UUIDs of students to assign.\nThis also auto-creates an `attendance_ledger` row at 250 for each student (ATT-4).\nUses `syncWithoutDetaching` — existing students are not removed.",
+            "url": {
+              "raw": "{{base_url}}/lab-groups/{{lab_group_id}}/students",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lab-groups",
+                "{{lab_group_id}}",
+                "students"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_ids\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Remove Student from Lab Group",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Remove Student from Lab Group\n**Access:** track_admin only\n\nDetaches the student from the group. Does not delete their ledger or attendance records.",
+            "url": {
+              "raw": "{{base_url}}/lab-groups/{{lab_group_id}}/students/{{user_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "lab-groups",
+                "{{lab_group_id}}",
+                "students",
+                "{{user_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "07-Engagements",
+      "item": [
+        {
+          "name": "List Engagements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Engagements\n**Access:** branch_manager · track_admin · instructor (own engagements only)\n\n**Query params (optional):**\n- `type` — lecture · lab · business_session\n- `instructor_id` — filter by instructor UUID",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/engagements",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "engagements"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "lab"
+                },
+                {
+                  "key": "instructor_id",
+                  "value": "{{user_id}}"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Engagement",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Engagement\n**Access:** track_admin only\n\n`lab_group_id` is REQUIRED when `type` is `lab` — returns `422` if missing (ENG-3).\n`lab_group_id` is ignored for `lecture` and `business_session`.\n\n**Type values:** lecture · lab · business_session",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/engagements",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "engagements"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"lab\",\n  \"instructor_id\": \"{{user_id}}\",\n  \"lab_group_id\": \"{{lab_group_id}}\",\n  \"starts_at\": \"2026-02-01\",\n  \"ends_at\": \"2026-04-30\",\n  \"hours_per_session\": 3.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"engagement_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Engagement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Engagement\n**Access:** branch_manager · track_admin · instructor (own engagement only)",
+            "url": {
+              "raw": "{{base_url}}/engagements/{{engagement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engagements",
+                "{{engagement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update Engagement",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Engagement\n**Access:** track_admin only",
+            "url": {
+              "raw": "{{base_url}}/engagements/{{engagement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engagements",
+                "{{engagement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ends_at\": \"2026-05-15\",\n  \"hours_per_session\": 4.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Engagement",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Delete Engagement\n**Access:** track_admin only\n\nCascades to delete all sessions under this engagement.",
+            "url": {
+              "raw": "{{base_url}}/engagements/{{engagement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engagements",
+                "{{engagement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "08-Sessions",
+      "item": [
+        {
+          "name": "List Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Sessions\n**Access:** branch_manager · track_admin · instructor (own engagement)",
+            "url": {
+              "raw": "{{base_url}}/engagements/{{engagement_id}}/sessions",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engagements",
+                "{{engagement_id}}",
+                "sessions"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Session\n**Access:** track_admin only\n\nCreates a single session date under an engagement.",
+            "url": {
+              "raw": "{{base_url}}/engagements/{{engagement_id}}/sessions",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "engagements",
+                "{{engagement_id}}",
+                "sessions"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_date\": \"2026-02-05\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"session_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Session Delivered",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Mark Session as Delivered\n**Access:** instructor (own engagement) · track_admin\n\nSets `is_delivered = true` and **automatically creates a billing record** (BIL-1).\nReturns `409` if the session was already delivered.\n\nAfter calling this, check the `billing_record` in the response to confirm hours were logged correctly.",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/deliver",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "deliver"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Delete Session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Delete Session\n**Access:** track_admin only",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "09-Attendance",
+      "item": [
+        {
+          "name": "List Session Attendance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Attendance for a Session\n**Access:** track_admin · instructor (own session)\n\nReturns all attendance records for the session including arrived_at, left_at, and status.",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/attendance",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "attendance"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Record Attendance",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Record Attendance (Manual)\n**Access:** instructor (own session) · track_admin\n\nFallback for when QR scanner is unavailable.\nRecording `absent` auto-deducts 25 from the student's ledger (ATT-5).\n\n**Status values:** present · absent · excused",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/attendance",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "attendance"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"{{user_id}}\",\n  \"arrived_at\": \"2026-02-05T09:03:00Z\",\n  \"status\": \"present\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"attendance_record_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Attendance Record",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Attendance Record\n**Access:** instructor (own session) · track_admin\n\nUsed for scan-out (adding `left_at`) or correcting a status.\n\n**ATT-5 — Status change ledger adjustments:**\n- absent → present: +25 refunded\n- absent → excused: +20 refunded (net -5)\n- present → absent: -25 deducted\n- excused → absent: -20 additional deduction",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/attendance/{{attendance_record_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "attendance",
+                "{{attendance_record_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"left_at\": \"2026-02-05T12:01:00Z\",\n  \"status\": \"present\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Student Attendance History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Student Attendance History\n**Access:** track_admin · instructor (students in own group) · student (own data only — POR-2)\n\nReturns full attendance history across all sessions in the student's cohort.",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/attendance",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "attendance"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10-Ledger",
+      "item": [
+        {
+          "name": "Get Student Ledger",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Attendance Ledger\n**Access:** track_admin · instructor (own group) · student (own data — POR-1)\n\nReturns current balance (starts at 250) plus a full history of every deduction and credit.\n\n**Deduction rules:**\n- Unexcused absence: -25\n- Excused absence: -5\n- Present: 0",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/ledger",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "ledger"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11-Excuse-Requests",
+      "item": [
+        {
+          "name": "List Excuse Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Excuse Requests\n**Access:** track_admin (all in their cohort) · student (own requests — POR-5)\n\n**Query params (optional):**\n- `status` — requested · approved · rejected\n- `student_id` — track_admin only: filter by student UUID",
+            "url": {
+              "raw": "{{base_url}}/excuse-requests",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "excuse-requests"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "requested"
+                },
+                {
+                  "key": "student_id",
+                  "value": "{{user_id}}"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Submit Excuse Request",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Submit Excuse Request\n**Access:** student only (EXC-1)\n\nThe attendance record must belong to the student and have status `absent`.\n`attachment` is optional — PDF or image only, max 1MB (EXC-2).\n\nReplace `/path/to/document.pdf` with the actual file path.",
+            "url": {
+              "raw": "{{base_url}}/excuse-requests",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "excuse-requests"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"excuse_request_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Excuse Request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Excuse Request\n**Access:** track_admin · student (own request)",
+            "url": {
+              "raw": "{{base_url}}/excuse-requests/{{excuse_request_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "excuse-requests",
+                "{{excuse_request_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Approve Excuse Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Approve Excuse Request\n**Access:** track_admin only\n\nAtomically:\n1. Sets excuse status → approved\n2. Updates attendance record status → excused\n3. Credits ledger +20 (net deduction goes from -25 to -5) (EXC-3)\n\nReturns `409` if the request was already reviewed.",
+            "url": {
+              "raw": "{{base_url}}/excuse-requests/{{excuse_request_id}}/approve",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "excuse-requests",
+                "{{excuse_request_id}}",
+                "approve"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewer_note\": \"Doctor's certificate accepted.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Reject Excuse Request",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Reject Excuse Request\n**Access:** track_admin only\n\nLedger is unchanged (-25 deduction stays). Returns `409` if already reviewed.",
+            "url": {
+              "raw": "{{base_url}}/excuse-requests/{{excuse_request_id}}/reject",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "excuse-requests",
+                "{{excuse_request_id}}",
+                "reject"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewer_note\": \"No valid documentation provided.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "12-Submissions",
+      "item": [
+        {
+          "name": "List Submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Submissions for a Session\n**Access:** track_admin · instructor (own session)\n\nReturns all submissions with days_late and grading status.",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/submissions",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "submissions"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Submit Lab Work",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Submit Lab Work\n**Access:** student (POR-4)\n\nSubmit either a `url` (GitHub/Drive link) OR a `file` — at least one is required.\nLate penalty is computed automatically at submission time (ENG-2):\n`penalty = daysLate × 0.25 × 10`, capped so score never goes below 0.\n\n`days_late` and `late_penalty` are returned in the response.",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/submissions",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "submissions"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"submission_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Grade Submission",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Grade a Submission\n**Access:** instructor (own session, students in own group only — GRD-4)\n\nReturns `403` if the instructor tries to grade a student from another lab group.\n\nFinal score = max(0, raw_score - late_penalty)\nLate penalty was already stored at submission time.",
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/submissions/{{submission_id}}/grade",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "submissions",
+                "{{submission_id}}",
+                "grade"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"raw_score\": 8.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Student Submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get All Submissions for a Student\n**Access:** track_admin · instructor (students in own group) · student (own data only)\n\nReturns all submissions across the student's cohort with grading status.",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/submissions",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "submissions"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "13-Grades",
+      "item": [
+        {
+          "name": "List Course Grades",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List All Grades for a Course\n**Access:** track_admin · instructor (students in own group only)\n\nReturns every student's computed score, override status, and latest override detail.",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}/grades",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}",
+                "grades"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Enter Exam Grade",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Enter Exam Grade\n**Access:** track_admin only (GRD-5)\n\nNormalized automatically using GRD-3 formula:\ncomputed_score = (exam_raw_score / exam_raw_max) × exam_weight\n\nExample: (67 / 70) × 60 = 57.43\n\nUses `updateOrCreate` — safe to call again to correct a grade before any override exists.",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}/grades",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}",
+                "grades"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": \"{{user_id}}\",\n  \"exam_raw_score\": 67,\n  \"exam_raw_max\": 70\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"grade_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Grade",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get a Single Grade\n**Access:** track_admin · instructor (own group) · student (own grade — POR-1)\n\nIncludes the full override history.",
+            "url": {
+              "raw": "{{base_url}}/courses/{{course_id}}/grades/{{grade_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "courses",
+                "{{course_id}}",
+                "grades",
+                "{{grade_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Student Grade Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Student Grade Summary\n**Access:** track_admin · instructor (own group) · student (own data — POR-1)\n\nThe key endpoint for student dashboards. Returns in one call:\n- Attendance ledger balance\n- Per-course breakdown (lab score + exam score + course total)\n- Grand total = attendance_ledger + sum(course_totals)\n- is_at_risk flag (ledger < 150 OR any course < 60)",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/grades/summary",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "grades",
+                "summary"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "14-Grade-Overrides",
+      "item": [
+        {
+          "name": "List Grade Overrides",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Grade Override Audit Trail\n**Access:** track_admin only\n\nReturns every override ever applied to this grade, sorted oldest → newest.\nOriginal values are permanently preserved — this is the audit trail (GRD-6).",
+            "url": {
+              "raw": "{{base_url}}/grades/{{grade_id}}/overrides",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grades",
+                "{{grade_id}}",
+                "overrides"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Override Grade",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Override a Grade\n**Access:** track_admin only\n\n`reason` is MANDATORY — returns `422` if missing or under 10 characters (GRD-6).\n\nWhat happens internally:\n1. Stores original_value (current computed_score) in grade_overrides table\n2. Updates course_grades.computed_score to new_value\n3. Neither the original value nor the reason can ever be changed\n\nCall GET /grades/{id}/overrides to see the full audit trail.",
+            "url": {
+              "raw": "{{base_url}}/grades/{{grade_id}}/override",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "grades",
+                "{{grade_id}}",
+                "override"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_value\": 72.0,\n  \"reason\": \"Re-graded after student resubmitted with corrections.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "15-Student-Tags",
+      "item": [
+        {
+          "name": "List Student Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Tags for a Student\n**Access:** track_admin · instructor (any who grades that student) (ACC-5)\n\nStudents cannot see their own tags.\nReturns all predefined and free-text tags with the name of who applied each.",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/tags",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "tags"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Add Student Tag",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Add a Tag to a Student\n**Access:** instructor (students in own group) · track_admin (GRD-7)\n\n**tag_type values:**\n- `predefined` — tag_value must be one of: \"uses AI\", \"Cheating\", \"loves extra work\"\n- `free_text` — tag_value can be any string\n\nReturns `422` if tag_type is `predefined` and tag_value is not in the allowed list.\n`note` is optional for any tag type.",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/tags",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "tags"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tag_type\": \"predefined\",\n  \"tag_value\": \"uses AI\",\n  \"note\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"tag_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Student Tag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Delete a Student Tag\n**Access:** track_admin only",
+            "url": {
+              "raw": "{{base_url}}/students/{{user_id}}/tags/{{tag_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "students",
+                "{{user_id}}",
+                "tags",
+                "{{tag_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "16-Announcements",
+      "item": [
+        {
+          "name": "List Announcements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Announcements\n**Access:** All roles in the cohort\n\nReturns announcements newest-first, with author name and role.",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/announcements",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "announcements"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Create Announcement\n**Access:** track_admin (anytime — ANN-1) · instructor (only during active engagement window — ANN-2)\n\nInstructors get `403` if they post outside their engagement's starts_at / ends_at window.",
+            "url": {
+              "raw": "{{base_url}}/cohorts/{{cohort_id}}/announcements",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cohorts",
+                "{{cohort_id}}",
+                "announcements"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Week 3 Lab Brief\",\n  \"body\": \"This week we focus on Eloquent relationships. Please review the docs before the session.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.environment.set(\"announcement_id\", pm.response.body.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Announcement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Announcement\n**Access:** All roles in the cohort",
+            "url": {
+              "raw": "{{base_url}}/announcements/{{announcement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Update Announcement",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Update Announcement\n**Access:** track_admin · instructor (own announcement, within engagement window only)",
+            "url": {
+              "raw": "{{base_url}}/announcements/{{announcement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Week 3 Lab Brief — Updated\",\n  \"body\": \"Updated content with corrected session details.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete Announcement",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Delete Announcement\n**Access:** track_admin · instructor (own announcement only)",
+            "url": {
+              "raw": "{{base_url}}/announcements/{{announcement_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "announcements",
+                "{{announcement_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "17-Billing",
+      "item": [
+        {
+          "name": "List Billing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## List Billing Rollup\n**Access:** branch_manager only (BIL-3, BIL-4)\n\nReturns a summary of total hours and pay per person across all delivered sessions.\n\n**Internal person pay:** fixed_salary + (total_hours × hourly_rate)\n**External person pay:** total_hours × hourly_rate\n\n**Query params (optional):**\n- `cohort_id` — filter by cohort\n- `person_type` — external · internal",
+            "url": {
+              "raw": "{{base_url}}/billing",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing"
+              ],
+              "query": [
+                {
+                  "key": "cohort_id",
+                  "value": "{{cohort_id}}"
+                },
+                {
+                  "key": "person_type",
+                  "value": "external"
+                }
+              ],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Get Person Billing",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Get Billing for a Person\n**Access:** branch_manager only\n\nReturns a session-by-session breakdown for one instructor or track admin,\nwith total hours and total pay at the bottom.",
+            "url": {
+              "raw": "{{base_url}}/billing/{{user_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "billing",
+                "{{user_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "18-Analytics",
+      "item": [
+        {
+          "name": "Branch Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Branch-Level Analytics Dashboard\n**Access:** branch_manager only (ACC-1)\n\nReturns a cross-track summary including:\n- Student count per track\n- Average attendance rate\n- Average grade\n- At-risk student count\n- Billing summary (total hours, external vs internal split, total cost)",
+            "url": {
+              "raw": "{{base_url}}/analytics/branch",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "branch"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Cohort Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Cohort Analytics Dashboard\n**Access:** track_admin (own cohort — ACC-2)\n\nReturns:\n- Grade distribution (above 90, 70–90, 60–70, below 60)\n- Full at-risk student list with reasons\n- Lab group grader consistency (mean score per group — useful for spotting unfair grading)\n- Per-session attendance rates\n- Submission status overview (submitted, missing, late)",
+            "url": {
+              "raw": "{{base_url}}/analytics/cohorts/{{cohort_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "cohorts",
+                "{{cohort_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Instructor Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Instructor Analytics Dashboard\n**Access:** instructor (own lab group only — ACC-3)\n\nScoped entirely to the authenticated instructor's assigned lab group. Returns:\n- Grade distribution for their group\n- Submission tracker per student (submitted, graded, days late)\n- Total delivered hours",
+            "url": {
+              "raw": "{{base_url}}/analytics/instructor",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "instructor"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "Student Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Student Analytics Dashboard\n**Access:** student (own data only — ACC-4, POR-3)\n\nThe main student-facing dashboard. Returns:\n- Current ledger balance\n- Attendance trend (session-by-session status)\n- Per-course scores (lab + exam + course total)\n- Grand total\n- is_at_risk flag\n\nNo peer data is ever included — strictly scoped to the authenticated student.",
+            "url": {
+              "raw": "{{base_url}}/analytics/student",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "student"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "At-Risk Students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## At-Risk Student List\n**Access:** branch_manager · track_admin (ANL-1)\n\n`cohort_id` is REQUIRED.\n\nA student is at-risk if EITHER condition is true (OR logic):\n- Ledger balance < 150\n- Any single course grade < 60\n\nEach student in the response includes:\n- Their current ledger balance\n- List of failing course names\n- List of at_risk_reasons: \"ledger_below_150\" and/or \"course_grade_below_60\"",
+            "url": {
+              "raw": "{{base_url}}/analytics/at-risk",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "analytics",
+                "at-risk"
+              ],
+              "query": [
+                {
+                  "key": "cohort_id",
+                  "value": "{{cohort_id}}"
+                }
+              ],
+              "variable": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "19-QR",
+      "item": [
+        {
+          "name": "Generate QR Payload",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Generate QR Code Payload\n**Access:** instructor (own session) · track_admin\n\nReturns a signed payload string to display as a QR code on the projector.\nThe payload format is: `iti-scan:{session_id}:{date}:{hmac_signature}`\n\nThe HMAC signature prevents students from forging check-ins.\nThe payload is only valid on the session's date — scanning the next day returns 422.\n\nCopy the `qr_payload` value and use a QR generator library/website to render it,\nor build it directly into the Vue frontend.",
+            "url": {
+              "raw": "{{base_url}}/qr/session/{{session_id}}",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "qr",
+                "session",
+                "{{session_id}}"
+              ],
+              "query": [],
+              "variable": []
+            }
+          }
+        },
+        {
+          "name": "QR Scan",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "auth": {
+              "type": "bearer",
+              "bearer": {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+              }
+            },
+            "description": "## Process a QR Scan (Check-In / Check-Out)\n**Access:** student only (ATT-1, ATT-2)\n\nReplace the `qr_payload` value with the actual payload from the Generate QR Payload endpoint.\n\n**Scan behaviour:**\n- 1st scan → records `arrived_at`, returns event: \"checked_in\"\n- 2nd scan → records `left_at`, returns event: \"checked_out\"\n- 3rd scan → returns `409` (already fully checked out)\n\n**Error cases:**\n- `422` — tampered or invalid payload (HMAC mismatch)\n- `422` — payload date does not match today's date\n- `409` — student already fully checked out for this session",
+            "url": {
+              "raw": "{{base_url}}/qr/scan",
+              "protocol": "",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "qr",
+                "scan"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_payload\": \"iti-scan:SESSION_UUID:2026-02-05:HMAC_SIGNATURE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "track_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "cohort_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "course_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "lab_group_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "engagement_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "session_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "attendance_record_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "excuse_request_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "submission_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "grade_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "tag_id",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "announcement_id",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
