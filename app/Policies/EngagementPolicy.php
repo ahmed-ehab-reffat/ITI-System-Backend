@@ -4,13 +4,12 @@ namespace App\Policies;
 
 use App\Models\Engagement;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class EngagementPolicy
 {
     public function viewAny(User $user): bool
     {
-        return true
+        return true;
     }
 
     public function view(User $user, Engagement $engagement): bool
