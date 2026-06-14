@@ -18,6 +18,7 @@ class SessionPolicy
         return match ($user->role) {
             'branch_manager', 'track_admin' => true,
             'instructor' => $engagement->instructor_id === $user->id,
+            'student' => $user->labGroups()->where('cohort_id', $engagement->cohort_id)->exists(),
             default => false,
         };
         

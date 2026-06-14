@@ -13,7 +13,10 @@ class EngagementPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->isBranchManager() || $user->isTrackAdmin();
+        return match ($user->role) {
+            'branch_manager', 'track_admin', 'student' => true,
+            default => false,
+        };
     }
 
     /**
@@ -21,16 +24,13 @@ class EngagementPolicy
      */
     public function view(User $user, Engagement $engagement): bool
     {
-        if ($user->isBranchManager() || $user->isTrackAdmin()) {
-            return true;
-        }
-
-        // Instructors can view their own engagements
-        if ($user->isInstructor()) {
-            return $engagement->instructor_id === $user->id;
-        }
-
-        return false;
+        return match ($user->role) {
+            'branch_manager', 'track_admin' => true,
+            'instructor' => $engagement->instructor_id === $user->id,
+            // Strict check: Student can only view engagements matching their cohort
+            'student' => $user->cohort_id === $engagement->cohort_id,
+            default => false,
+        };
     }
 
     /**
