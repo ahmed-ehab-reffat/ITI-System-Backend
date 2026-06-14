@@ -47,7 +47,7 @@ class UserController extends Controller
 
         $user = User::create([
             ...$request->validated(),
-            'password' => bcrypt('Welcome@ITI1'),
+            'password' => bcrypt($request->validated('password')),
         ]);
 
         return response()->json([

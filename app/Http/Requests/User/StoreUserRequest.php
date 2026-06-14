@@ -65,6 +65,7 @@ class StoreUserRequest extends FormRequest
                 'min:0',
             ],
 
+            'password' => ['required', 'string', 'min:8', 'max:255'],
             'expires_at' => ['nullable', 'date', 'after:now'],
         ];
     }
