@@ -320,6 +320,42 @@ class WaelFeaturesTest extends TestCase
             ->assertStatus(200); // Manager can see at-risk list
     }
 
+    public function test_instructor_can_see_full_session_roster_and_create_absent_record(): void
+    {
+        $response = $this->actingAs($this->instructor)
+            ->getJson("/api/sessions/{$this->session->id}/attendance");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('data.0.student.id', $this->student->id)
+            ->assertJsonPath('data.0.status', null);
+
+        $createResponse = $this->actingAs($this->instructor)
+            ->postJson("/api/sessions/{$this->session->id}/attendance", [
+                'records' => [
+                    [
+                        'student_id' => $this->student->id,
+                        'status' => 'absent',
+                    ],
+                ],
+            ]);
+
+        $createResponse->assertStatus(200)
+            ->assertJsonPath('data.0.status', 'absent')
+            ->assertJsonPath('data.0.student.id', $this->student->id);
+
+        $this->assertDatabaseHas('attendance_records', [
+            'session_id' => $this->session->id,
+            'student_id' => $this->student->id,
+            'status' => 'absent',
+        ]);
+
+        $absenceHistory = $this->actingAs($this->student)
+            ->getJson("/api/students/{$this->student->id}/attendance");
+
+        $absenceHistory->assertStatus(200)
+            ->assertJsonPath('data.0.status', 'absent');
+    }
+
     // ─────────────────────────────────────────────────────────
     // 5. QR CODE ATTENDANCE
     // ─────────────────────────────────────────────────────────

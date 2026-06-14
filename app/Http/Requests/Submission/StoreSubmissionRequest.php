@@ -18,15 +18,15 @@ class StoreSubmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'url'  => ['nullable', 'url', 'max:2048', 'required_without:file'],
-            'file' => ['nullable', 'file', 'max:10240', 'required_without:url'],
+            'url' => ['nullable', 'url', 'max:1024', 'required_without:file'],
+            'file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,gif,bmp,svg', 'max:1024', 'required_without:url'],
         ];
     }
 
     public function withValidator($validator): void
     {
         $validator->after(function ($v) {
-            $hasUrl  = $this->filled('url');
+            $hasUrl = $this->filled('url');
             $hasFile = $this->hasFile('file');
 
             if ($hasUrl && $hasFile) {
