@@ -8,24 +8,24 @@ use Illuminate\Auth\Access\Response;
 
 class EngagementPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return $user->isBranchManager() || $user->isTrackAdmin();
+        return
+            $user->isBranchManager() ||
+            $user->isTrackAdmin() ||
+            $user->isInstructor();
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Engagement $engagement): bool
     {
-        if ($user->isBranchManager() || $user->isTrackAdmin()) {
+        if ($user->isBranchManager()) {
             return true;
         }
 
-        // Instructors can view their own engagements
+        if ($user->isTrackAdmin()) {
+            return true;
+        }
+
         if ($user->isInstructor()) {
             return $engagement->instructor_id === $user->id;
         }
